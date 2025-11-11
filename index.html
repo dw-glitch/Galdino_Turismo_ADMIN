@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voucher Galdino Turismo</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <img src="logo.png" alt="Logo Galdino Turismo" class="logo">
+        <h1>Galdino Turismo</h1>
+        <p class="phone">Telefone: (81) 9751-7571</p>
+    </header>
+    <main>
+        <h2>Voucher de Turismo</h2>
+        <form id="voucherForm">
+            <div class="form-section">
+                <h3>Dados dos Clientes</h3>
+                <div id="clientsContainer">
+                    <!-- Client fields will be added here dynamically -->
+                </div>
+                <button type="button" id="addClientBtn" style="width: auto; margin-top: 10px;">Adicionar Cliente</button>
+            </div>
+
+            <div class="form-section">
+                <h3>Informações do Voo</h3>
+                <div class="form-group">
+                    <label for="numeroPassageiros">Número de Passageiros:</label>
+                    <input type="number" id="numeroPassageiros" name="numeroPassageiros" required min="1">
+                </div>
+                <div class="form-group">
+                    <label for="numeroCriancas">Número de Crianças:</label>
+                    <input type="number" id="numeroCriancas" name="numeroCriancas" required min="0">
+                </div>
+                <div class="form-group">
+                    <label for="numeroVooChegada">Número do Voo de Chegada:</label>
+                    <input type="text" id="numeroVooChegada" name="numeroVooChegada" required>
+                </div>
+                <div class="form-group">
+                    <label for="horaVooChegada">Horario de Previsão de Chegada:</label>
+                    <input type="time" id="horaVooChegada" name="horaVooChegada" required>
+                </div>
+                <div class="form-group">
+                    <label for="numeroVooPartida">Número do Voo de Partida:</label>
+                    <input type="text" id="numeroVooPartida" name="numeroVooPartida" required>
+                </div>
+                <div class="form-group">
+                    <label for="horaVooPartida">Horário do Voo de Partida:</label>
+                    <input type="time" id="horaVooPartida" name="horaVooPartida" required>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Hospedagem</h3>
+                <div class="form-group">
+                    <label for="hotel">Nome do Hotel:</label>
+                    <input type="text" id="hotel" name="hotel" required>
+                </div>
+                <div class="form-group">
+                    <label for="pago">Status do Pagamento:</label>
+                    <select id="pago" name="pago" required>
+                        <option value="">Selecione</option>
+                        <option value="Pago">Pago</option>
+                        <option value="Pendente">Pendente</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>Informações do Transporte</h3>
+                <div class="form-group">
+                    <label for="nomeMotorista">Nome do Motorista:</label>
+                    <input type="text" id="nomeMotorista" name="nomeMotorista" required>
+                </div>
+                <div class="form-group">
+                    <label for="placaCarro">Número da Placa do Carro:</label>
+                    <input type="text" id="placaCarro" name="placaCarro" required>
+                </div>
+                <div class="form-group">
+                    <label for="telefoneMotorista">Telefone / Contato do Motorista:</label>
+                    <input type="text" id="telefoneMotorista" name="telefoneMotorista" required>
+                </div>
+            </div>
+
+            <button type="button" id="generatePDF">Gerar Voucher PNG</button>
+        </form>
+        <div id="voucherPreview" style="display: none;">
+            <div class="voucher-header">
+                <img src="logo.png" alt="Logo Galdino Turismo" class="voucher-logo">
+                <h3>Voucher de Turismo - Galdino Turismo</h3>
+                <p class="voucher-date">Data de Emissão: <span id="previewDataEmissao"></span></p>
+            </div>
+
+            <div class="voucher-section">
+                <h4>Dados dos Clientes</h4>
+                <div id="previewClients" class="voucher-info">
+                    <!-- Clients will be listed here -->
+                </div>
+            </div>
+
+            <div class="voucher-section">
+                <h4>Informações do Voo</h4>
+                <div class="voucher-info">
+                    <p><strong>Número de Passageiros:</strong> <span id="previewPassageiros"></span></p>
+                    <p><strong>Número de Crianças:</strong> <span id="previewCriancas"></span></p>
+                    <p><strong>Número do Voo de Chegada:</strong> <span id="previewVooChegada"></span></p>
+                    <p><strong>Horário do Voo de Chegada:</strong> <span id="previewHoraVooChegada"></span></p>
+                    <p><strong>Número do Voo de Partida:</strong> <span id="previewVooPartida"></span></p>
+                    <p><strong>Horário do Voo de Partida:</strong> <span id="previewHoraVooPartida"></span></p>
+                </div>
+            </div>
+
+            <div class="voucher-section">
+                <h4>Hospedagem</h4>
+                <div class="voucher-info">
+                    <p><strong>Hotel:</strong> <span id="previewHotel"></span></p>
+                    <p><strong>Status do Pagamento:</strong> <span id="previewPago"></span></p>
+                </div>
+            </div>
+
+            <div class="voucher-section">
+                <h4>Informações do Transporte</h4>
+                <div class="voucher-info">
+                    <p><strong>Nome do Motorista:</strong> <span id="previewNomeMotorista"></span></p>
+                    <p><strong>Placa do Carro:</strong> <span id="previewPlacaCarro"></span></p>
+                    <p><strong>Telefone/Contato:</strong> <span id="previewTelefoneMotorista"></span></p>
+                </div>
+            </div>
+
+            <div class="voucher-footer">
+                <p>Telefone: (81) 9751-7571 | Galdino Turismo - Sua viagem dos sonhos começa aqui</p>
+            </div>
+        </div>
+    </main>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

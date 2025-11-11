@@ -1,0 +1,430 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #0C233F 0%, #1a3a5c 100%);
+    color: #333;
+    min-height: 100vh;
+}
+
+header {
+    background-color: #0C233F; /* New Navy Blue */
+    color: #C8A043; /* New Gold */
+    text-align: center;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.logo {
+    width: 100px;
+    height: auto;
+    margin-bottom: 10px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2.5em;
+    font-weight: bold;
+}
+
+.phone {
+    margin: 10px 0 0 0;
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+main {
+    max-width: 800px;
+    margin: 20px auto;
+    padding: 30px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(200, 160, 67, 0.1);
+}
+
+h2 {
+    color: #0C233F;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #0C233F;
+    font-size: 0.95em;
+    letter-spacing: 0.5px;
+}
+
+input[type="text"], input[type="date"], input[type="time"], input[type="number"], select {
+    width: 100%;
+    padding: 14px 16px;
+    border: 2px solid rgba(200, 160, 67, 0.2);
+    border-radius: 8px;
+    box-sizing: border-box;
+    font-size: 16px;
+    background-color: rgba(255, 255, 255, 0.9);
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+input[type="text"]:focus, input[type="date"]:focus, input[type="time"]:focus, input[type="number"]:focus, select:focus {
+    border-color: #C8A043;
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(200, 160, 67, 0.15), 0 2px 8px rgba(12, 35, 63, 0.1);
+    background-color: white;
+}
+
+button {
+    background: linear-gradient(135deg, #0C233F 0%, #1a3a5c 100%);
+    color: #C8A043;
+    border: 2px solid #C8A043;
+    padding: 14px 24px;
+    font-size: 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    margin-top: 25px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    background: linear-gradient(135deg, #1a3a5c 0%, #0C233F 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(12, 35, 63, 0.3);
+}
+
+#voucherPreview {
+    margin-top: 30px;
+    padding: 25px;
+    border: 2px solid #C8A043;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+#voucherPreview h3 {
+    color: #0C233F;
+    margin-top: 0;
+}
+
+.form-section {
+    margin-bottom: 25px;
+    padding: 25px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(200, 160, 67, 0.3);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.form-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, #0C233F 0%, #C8A043 100%);
+}
+
+.form-section h3 {
+    color: #0C233F;
+    margin-top: 0;
+    margin-bottom: 15px;
+    font-size: 1.3em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    position: relative;
+    z-index: 1;
+}
+
+#voucherPreview {
+    margin-top: 30px;
+    padding: 35px;
+    border: 3px solid #C8A043;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 50%, #f0f2f5 100%);
+    box-shadow: 0 8px 32px rgba(12, 35, 63, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    position: relative;
+    overflow: hidden;
+}
+
+#voucherPreview::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0C233F 0%, #C8A043 50%, #0C233F 100%);
+}
+
+.voucher-header {
+    text-align: center;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #C8A043;
+    padding-bottom: 15px;
+    position: relative;
+}
+
+.voucher-logo {
+    width: 80px;
+    height: auto;
+    margin-bottom: 15px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.voucher-header h3 {
+    color: #0C233F;
+    margin: 0 0 10px 0;
+    font-size: 1.8em;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.voucher-date {
+    color: #666;
+    margin: 0;
+    font-size: 0.9em;
+}
+
+.voucher-section {
+    margin-bottom: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(248, 249, 250, 0.8) 100%);
+    border-radius: 10px;
+    border: 1px solid rgba(200, 160, 67, 0.4);
+    box-shadow: 0 2px 8px rgba(12, 35, 63, 0.08);
+    position: relative;
+}
+
+.voucher-section h4 {
+    color: #0C233F;
+    margin: 0 0 12px 0;
+    font-size: 1.2em;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 2px solid #C8A043;
+    padding-bottom: 8px;
+    position: relative;
+}
+
+.voucher-section h4::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 30px;
+    height: 2px;
+    background: linear-gradient(90deg, #0C233F 0%, #C8A043 100%);
+}
+
+.voucher-info p {
+    margin: 10px 0;
+    line-height: 1.6;
+    color: #333;
+    font-size: 0.95em;
+}
+
+.voucher-info strong {
+    color: #0C233F;
+    font-weight: 700;
+    font-size: 1.05em;
+}
+
+.clients-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+
+.clients-table th,
+.clients-table td {
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(200, 160, 67, 0.3);
+}
+
+.clients-table th {
+    background-color: rgba(12, 35, 63, 0.1);
+    color: #0C233F;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 0.85em;
+}
+
+.clients-table td {
+    color: #333;
+}
+
+.clients-table tr:nth-child(even) {
+    background-color: rgba(248, 249, 250, 0.5);
+}
+
+.clients-table tr:hover {
+    background-color: rgba(200, 160, 67, 0.1);
+}
+
+/* Espaçamento extra para área de clientes no formulário */
+#clientsContainer .client-entry {
+    margin-bottom: 18px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(200, 160, 67, 0.15);
+}
+
+#clientsContainer .client-entry:last-child {
+    border-bottom: none;
+}
+
+.remove-client {
+    background: none;
+    color: #C8A043;
+    border: 1px solid #C8A043;
+    padding: 6px 14px;
+    font-size: 0.95em;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-top: 5px;
+    margin-bottom: 0;
+    width: auto;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
+}
+
+.remove-client:hover {
+    background: #C8A043;
+    color: #0C233F;
+}
+
+.voucher-footer {
+    margin-top: 30px;
+    padding: 20px;
+    border-top: 3px solid #C8A043;
+    text-align: center;
+    color: #0C233F;
+    font-size: 0.95em;
+    font-weight: 600;
+    background: linear-gradient(135deg, rgba(200, 160, 67, 0.1) 0%, rgba(12, 35, 63, 0.05) 100%);
+    border-radius: 0 0 12px 12px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    header {
+        padding: 15px;
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .logo {
+        width: 80px;
+        margin-bottom: 10px;
+    }
+
+    header h1 {
+        font-size: 1.8em;
+        margin-bottom: 5px;
+    }
+
+    .phone {
+        font-size: 0.9em;
+        margin-top: 5px;
+    }
+
+    main {
+        margin: 10px;
+        padding: 20px;
+        max-width: none;
+    }
+
+    h2 {
+        font-size: 1.5em;
+        margin-bottom: 15px;
+    }
+
+    .form-group {
+        margin-bottom: 12px;
+    }
+
+    label {
+        font-size: 0.9em;
+        margin-bottom: 3px;
+    }
+
+    input[type="text"], input[type="date"] {
+        font-size: 16px; /* Prevent zoom on iOS */
+        padding: 8px;
+    }
+
+    button {
+        font-size: 16px;
+        padding: 12px 20px;
+        margin-top: 15px;
+    }
+
+    #voucherPreview {
+        padding: 15px;
+        margin-top: 20px;
+    }
+
+    #voucherPreview h3 {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+
+    #voucherPreview p {
+        font-size: 0.9em;
+        margin: 8px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        padding: 10px;
+    }
+
+    .logo {
+        width: 60px;
+    }
+
+    header h1 {
+        font-size: 1.5em;
+    }
+
+    .phone {
+        font-size: 0.8em;
+    }
+
+    main {
+        margin: 5px;
+        padding: 15px;
+    }
+
+    h2 {
+        font-size: 1.3em;
+    }
+
+    button {
+        padding: 10px 15px;
+    }
+}

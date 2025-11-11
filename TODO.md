@@ -1,0 +1,6 @@
+- [x] Update index.html to remove birth date field and make clients section dynamic with Name and CPF/RG fields
+- [x] Update script.js to handle multiple clients, remove birth date logic, and populate previewClients with a list
+- [x] Adjust styles.css if needed for the list display
+- [x] Test PNG generation to ensure same size and layout
+- [x] Add driver information fields (name, car plate, phone) to form
+- [x] Add transport information section to voucher preview
