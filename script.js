@@ -73,8 +73,18 @@ document.getElementById('generatePDF').addEventListener('click', async function(
 
   document.getElementById('previewPassageiros').textContent = document.getElementById('numeroPassageiros').value;
   document.getElementById('previewCriancas').textContent = document.getElementById('numeroCriancas').value;
+  
+  // Formata datas para o padrão brasileiro
+  const formatDate = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString + 'T00:00:00');
+    return date.toLocaleDateString('pt-BR');
+  };
+  
+  document.getElementById('previewDataChegada').textContent = formatDate(document.getElementById('dataChegada').value);
   document.getElementById('previewVooChegada').textContent = document.getElementById('numeroVooChegada').value;
   document.getElementById('previewHoraVooChegada').textContent = document.getElementById('horaVooChegada').value;
+  document.getElementById('previewDataSaida').textContent = formatDate(document.getElementById('dataSaida').value);
   document.getElementById('previewVooPartida').textContent = document.getElementById('numeroVooPartida').value;
   document.getElementById('previewHoraVooPartida').textContent = document.getElementById('horaVooPartida').value;
   document.getElementById('previewHotel').textContent = document.getElementById('hotel').value;
