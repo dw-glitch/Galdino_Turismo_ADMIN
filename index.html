@@ -34,12 +34,20 @@
                     <input type="number" id="numeroCriancas" name="numeroCriancas" required min="0">
                 </div>
                 <div class="form-group">
+                    <label for="dataChegada">Data de Chegada:</label>
+                    <input type="date" id="dataChegada" name="dataChegada" required>
+                </div>
+                <div class="form-group">
                     <label for="numeroVooChegada">Número do Voo de Chegada:</label>
                     <input type="text" id="numeroVooChegada" name="numeroVooChegada" required>
                 </div>
                 <div class="form-group">
                     <label for="horaVooChegada">Horario de Previsão de Chegada:</label>
                     <input type="time" id="horaVooChegada" name="horaVooChegada" required>
+                </div>
+                <div class="form-group">
+                    <label for="dataSaida">Data de Saída:</label>
+                    <input type="date" id="dataSaida" name="dataSaida" required>
                 </div>
                 <div class="form-group">
                     <label for="numeroVooPartida">Número do Voo de Partida:</label>
@@ -104,8 +112,10 @@
                 <div class="voucher-info">
                     <p><strong>Número de Passageiros:</strong> <span id="previewPassageiros"></span></p>
                     <p><strong>Número de Crianças:</strong> <span id="previewCriancas"></span></p>
+                    <p><strong>Data de Chegada:</strong> <span id="previewDataChegada"></span></p>
                     <p><strong>Número do Voo de Chegada:</strong> <span id="previewVooChegada"></span></p>
                     <p><strong>Horário do Voo de Chegada:</strong> <span id="previewHoraVooChegada"></span></p>
+                    <p><strong>Data de Saída:</strong> <span id="previewDataSaida"></span></p>
                     <p><strong>Número do Voo de Partida:</strong> <span id="previewVooPartida"></span></p>
                     <p><strong>Horário do Voo de Partida:</strong> <span id="previewHoraVooPartida"></span></p>
                 </div>
