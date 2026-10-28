@@ -46,6 +46,7 @@
     const result = { clients: [], fields: {}, notes: [], unrecognized: [], warnings: [] };
     let section = "";
     let lastClient = null;
+    let collectingClient = false;
     let notesMode = false;
 
     function assign(field, raw, origin) {
@@ -60,16 +61,18 @@
     }
 
     function addClient(name, id) {
-      const client = { nome: clean(name).replace(/[.,;]+$/, ""), cpf: clean(id) };
+      const client = { nome: clean(name).replace(/[.,;]+$/, ""), cpf: clean(id), dataNascimento: "", idade: "" };
       if (!client.nome && !client.cpf) return;
       const duplicate = result.clients.find(c => client.nome && normalize(c.nome) === normalize(client.nome));
       if (duplicate) {
         if (!duplicate.cpf && client.cpf) duplicate.cpf = client.cpf;
         lastClient = duplicate;
+        collectingClient = true;
         return;
       }
       result.clients.push(client);
       lastClient = client;
+      collectingClient = true;
     }
 
     function addId(value) {
@@ -81,6 +84,20 @@
       }
       if (!lastClient) addClient("", id);
       else lastClient.cpf = id;
+      collectingClient = true;
+    }
+
+    function setBirthDate(value) {
+      const parsedDate = dateFrom(value);
+      if (!lastClient || !collectingClient || !parsedDate) return false;
+      if (lastClient.dataNascimento && lastClient.dataNascimento !== parsedDate) {
+        result.warnings.push("Mais de uma data de nascimento para " + (lastClient.nome || "passageiro") + ". Confira.");
+      } else {
+        lastClient.dataNascimento = parsedDate;
+      }
+      const m = /\b(\d{1,3})\s*anos?\b/i.exec(value);
+      if (m && +m[1] <= 120) lastClient.idade = m[1];
+      return true;
     }
 
     function setPayment(value) {
@@ -159,6 +176,21 @@
           return true;
         }
       }
+      if (/^(?:origem|cidade de origem|local de saida|embarque em)$/.test(key)) {
+        assign("origem", val, label); section = "transport"; return true;
+      }
+      if (/^(?:destino|cidade de destino|desembarque em)$/.test(key)) {
+        assign("destino", val, label); section = "transport"; return true;
+      }
+      if (/^(?:trajeto|rota|transfer|itinerario)$/.test(key)) {
+        const route = /^(?:saida\s+)?(?:de\s+)?(.+?)\s+(?:para|ate|a)\s+(.+)$/i.exec(normalize(val));
+        if (route) {
+          const originalRoute = /^(?:sa[ií]da\s+)?(?:de\s+)?(.+?)\s+(?:para|at[eé]|a)\s+(.+)$/i.exec(val);
+          assign("origem", originalRoute[1], label);
+          assign("destino", originalRoute[2], label);
+        } else result.warnings.push("Trajeto sem origem e destino claros: " + val);
+        section = "transport"; return true;
+      }
       if (/^(?:hotel|pousada|resort|hospedagem|nome (?:do )?hotel|acomodacao|local de hospedagem)$/.test(key)) {
         assign("hotel", val, label); return true;
       }
@@ -230,6 +262,15 @@
     function processNatural(line) {
       const n = normalize(line);
       let m;
+      // Um deslocamento terrestre não é uma data ou voo de partida.
+      const route = /^(?:(?:sa[ií]da|transfer|trajeto|viagem|transporte)\s+)?de\s+(.+?)\s+(?:para|at[eé]|a)\s+(.+?)\s*[.!]?$/i.exec(line);
+      if (route && !DATE.test(line)) {
+        assign("origem", route[1], "origem do deslocamento");
+        assign("destino", route[2].replace(/[.,;]+$/, ""), "destino do deslocamento");
+        section = "transport";
+        collectingClient = false;
+        return true;
+      }
       if (/^(?:informacoes? do voo|dados dos clientes|hospedagem|informacoes? do transporte|dados do transfer|transporte)$/.test(n)) {
         section = /clientes/.test(n) ? "clients" : /transporte|transfer/.test(n) ? "transport" : ""; return true;
       }
@@ -306,10 +347,66 @@
       .replace(/\*\s*([^*\n]+)\s*\*\s*:/g, "$1:");
     const lines = cleanedText.split("\n").flatMap(value => value.split(LABEL_SPLIT));
 
-    for (const original of lines) {
+    for (let i = 0; i < lines.length; i++) {
+      const original = lines[i];
       const line = clean(original.replace(/^\[\d{1,2}\/\d{1,2}\/\d{2,4},?\s*\d{1,2}:\d{2}\]\s*[^:]{1,35}:\s*/, "")
-        .replace(/^(?:[-*•📌✅✈️🏨👤📅📍🚗]\s*|\d+[.)]\s*)/, ""));
+        .replace(/^(?:[-*•📌✅✈️🏨👤📅📍🚗]\s*|\d+[.)]\s+)/, ""));
       if (!line) continue;
+      // Lista de passageiros sem questionário: nome em uma linha, CPF e nascimento
+      // em outras (ou na mesma linha) não podem ser classificados como texto avulso.
+      // Evita interpretar nomes de hotéis, destinos, voos e motorista como passageiros.
+      if (!notesMode) {
+        // Variação frequente: "NOME COMPLETO - CPF 000.000.000-00 - 10/02/1990"
+        // ou "Nome: Maria Silva CPF: 000.000.000-00".
+        const inlinePerson = /^(?:(?:nome|cliente|passageiro|h[oó]spede)\s*[:=-]\s*)?([\p{L}][\p{L}\s.'’-]{3,110}?)\s*(?:[-–—]\s*)?(?:CPF|RG)\s*[:=-]?\s*(\d{3}[.\s]?\d{3}[.\s]?\d{3}[-.\s]?\d{2}|\d{11}|\d{4,12})\b/iu.exec(line);
+        if (inlinePerson &&
+            !/\b(?:hotel|pousada|resort|motorista|placa|destino|origem|transfer)\b/i.test(normalize(inlinePerson[1]))) {
+          addClient(inlinePerson[1], inlinePerson[2]);
+          const tail = line.slice(inlinePerson[0].length);
+          if (DATE.test(tail)) setBirthDate(tail);
+          else if (tail.trim() && !/^[\s,;–—-]+$/.test(tail)) result.unrecognized.push(tail.trim());
+          section = "clients";
+          continue;
+        }
+        const cpfLine = /^(?:CPF|CPF\s*\/\s*RG)\s*[:=\-]?\s*(\d{3}[.\s]?\d{3}[.\s]?\d{3}[-.\s]?\d{2}|\d{11})\b/i.exec(line);
+        const rgLine = /^RG\s*[:=\-]?\s*([\d.\-]{4,20})/i.exec(line);
+        const bareCpf = collectingClient ? /^(\d{3}\.\d{3}\.\d{3}-\d{2}|\d{11})\b/.exec(line) : null;
+        if (cpfLine || rgLine || bareCpf) {
+          const match = cpfLine || rgLine || bareCpf;
+          addId(match[1].trim());
+          const afterId = line.slice(match[0].length).trim();
+          if (afterId && DATE.test(afterId)) setBirthDate(afterId);
+          else if (afterId && !/^[,;\s-]*$/.test(afterId)) result.unrecognized.push(afterId);
+          continue;
+        }
+
+        const routeFirst = /^(?:sa[ií]da|transfer|trajeto|viagem|transporte)\s+de\s+(.+?)\s+(?:para|at[eé]|a)\s+(.+?)\s*[.!]?$/i.exec(line);
+        if (routeFirst && !DATE.test(line)) {
+          assign("origem", routeFirst[1], "origem do deslocamento");
+          assign("destino", routeFirst[2].replace(/[.,;]+$/, ""), "destino do deslocamento");
+          section = "transport";
+          collectingClient = false;
+          continue;
+        }
+
+        if (collectingClient && lastClient && DATE.test(line) &&
+            /^(?:(?:data\s+(?:de\s+)?nascimento|nascimento|nasc\.?|dn)\s*[:=\-]?\s*)?\d{1,2}[\/.-]\d{1,2}[\/.-]\d{4}(?:\s*[-–—,]\s*\d{1,3}\s*anos?)?\s*$/i.test(line)) {
+          if (setBirthDate(line)) continue;
+        }
+
+        const nameCandidate = line.replace(DATE, "").replace(/\s*[-–—,]\s*\d{1,3}\s*anos?\b/i, "").trim();
+        const looksLikeName = /^[\p{Lu}][\p{L}'’-]+(?:\s+(?:[\p{Lu}][\p{L}'’-]+|de|da|do|dos|das)){1,9}$/u.test(nameCandidate);
+        const reserved = /\b(?:hotel|pousada|resort|motorista|condutor|origem|destino|saida|chegada|voo|transfer|trajeto|passageiro|passageiros|hospedagem|informacoes|informacao|pagamento|observacoes|cpf|data|telefone|contato|aeroporto|porto\s+de\s+galinhas)\b/i.test(normalize(nameCandidate));
+        const next = lines.slice(i + 1).map(x => x.trim()).find(Boolean) || "";
+        const followedByCpf = /^(?:CPF\s*[:=\-]?\s*)?\d{3}[.\s]?\d{3}[.\s]?\d{3}[-.\s]?\d{2}\b/i.test(next);
+        const followedByBirth = /^(?:nascimento\s*[:=]\s*)?\d{1,2}[\/.-]\d{1,2}[\/.-]\d{4}\b/i.test(next);
+        if (looksLikeName && !reserved && (nameCandidate === nameCandidate.toLocaleUpperCase("pt-BR") || section === "clients" || followedByCpf || followedByBirth)) {
+          addClient(nameCandidate, "");
+          if (DATE.test(line)) setBirthDate(line);
+          section = "clients";
+          continue;
+        }
+      }
       // Rótulos podem aparecer com '=' ou dois pontos. Evita confundir horários.
       const labelled = /^([^:=]{2,75}?)\s*[:=]\s*(.*)$/.exec(line);
       if (labelled && processLabel(labelled[1], labelled[2])) continue;
@@ -317,7 +414,12 @@
       const hyphen = /^([\p{L}\s/]{3,45}?)\s+-\s+(.+)$/u.exec(line);
       if (hyphen && processLabel(hyphen[1], hyphen[2])) continue;
       if (notesMode) { result.notes.push(line); continue; }
-      if (!processNatural(line)) result.unrecognized.push(line);
+      if (!processNatural(line)) {
+        result.unrecognized.push(line);
+        collectingClient = false;
+      } else if (section !== "clients") {
+        collectingClient = false;
+      }
     }
     // Mantém total explícito como fonte primária; só calcula quando o texto fornece contagens de adultos e crianças.
     if (!result.fields.numeroPassageiros && result.fields._adultos !== undefined) {
@@ -325,6 +427,9 @@
       result.fields.numeroPassageiros = String(+result.fields._adultos + kids);
     }
     delete result.fields._adultos;
+    if (!result.fields.numeroPassageiros && result.clients.length) {
+      result.fields.numeroPassageiros = String(result.clients.length);
+    }
     return result;
   }
 

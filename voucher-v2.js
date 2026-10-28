@@ -17,7 +17,9 @@
     ["pago", "previewPago"],
     ["nomeMotorista", "previewNomeMotorista"],
     ["placaCarro", "previewPlacaCarro"],
-    ["telefoneMotorista", "previewTelefoneMotorista"]
+    ["telefoneMotorista", "previewTelefoneMotorista"],
+    ["origem", "previewOrigem"],
+    ["destino", "previewDestino"]
   ];
 
   // Interpretação em módulo isolado, usando os campos exatos do formulário manual.
@@ -41,7 +43,9 @@
     document.querySelectorAll("#clientsContainer .client-entry").forEach((entry) => {
       const nome = entry.querySelector('input[name^="nome"]')?.value.trim() || "";
       const cpf = entry.querySelector('input[name^="cpf"]')?.value.trim() || "";
-      if (nome || cpf) result.clients.push({ nome, cpf });
+      const dataNascimento = entry.querySelector('input[name^="nascimento"]')?.value.trim() || "";
+      const idade = entry.querySelector('input[name^="idade"]')?.value.trim() || "";
+      if (nome || cpf || dataNascimento || idade) result.clients.push({ nome, cpf, dataNascimento, idade });
     });
     for (const [field] of FIELDS) {
       const value = byId(field)?.value.trim() || "";
@@ -73,7 +77,7 @@
     table.className = "clients-table";
     const thead = document.createElement("thead");
     const row = document.createElement("tr");
-    for (const label of ["Nome Completo", "CPF ou RG"]) {
+    for (const label of ["Nome Completo", "CPF ou RG", "Nascimento", "Idade"]) {
       const th = document.createElement("th");
       th.textContent = label;
       row.appendChild(th);
@@ -81,9 +85,9 @@
     thead.appendChild(row);
     table.appendChild(thead);
     const tbody = document.createElement("tbody");
-    for (const person of clients.length ? clients : [{ nome: "", cpf: "" }]) {
+    for (const person of clients.length ? clients : [{ nome: "", cpf: "", dataNascimento: "", idade: "" }]) {
       const tr = document.createElement("tr");
-      for (const content of [person.nome, person.cpf]) {
+      for (const content of [person.nome, person.cpf, formatDate(person.dataNascimento), person.idade ? person.idade + " anos" : ""]) {
         const td = document.createElement("td");
         td.textContent = content || "Não informado";
         if (!content) td.classList.add("not-provided");
@@ -208,6 +212,7 @@
   function updateQuickPreview() {
     const data = parseQuickText(byId("quickText").value);
     const filled = FIELDS.filter(([field]) => data.fields[field]).length;
+    const births = data.clients.filter(person => person.dataNascimento).length;
     const recognized = data.clients.length + filled + data.notes.length;
     const flagged = data.unrecognized.concat(data.warnings);
     const summary = byId("quickSummary");
@@ -219,7 +224,8 @@
       return;
     }
     summary.textContent = recognized
-      ? "Identificados: " + filled + " campos, " + data.clients.length + " cliente(s)" +
+      ? "Identificados: " + filled + " campos, " + data.clients.length + " passageiro(s)" +
+        (births ? ", " + births + " data(s) de nascimento" : "") +
         (data.notes.length ? " e observações." : ".") +
         " O voucher abaixo está no mesmo padrão do preenchimento manual."
       : "Nenhum dado reconhecido com segurança. Confira os trechos abaixo ou use o formulário.";
@@ -241,11 +247,13 @@
 
   function fillManualForm(data) {
     byId("clientsContainer").replaceChildren();
-    for (const client of data.clients.length ? data.clients : [{ nome: "", cpf: "" }]) {
+    for (const client of data.clients.length ? data.clients : [{ nome: "", cpf: "", dataNascimento: "", idade: "" }]) {
       addClient();
       const entry = byId("clientsContainer").lastElementChild;
       entry.querySelector('input[name^="nome"]').value = client.nome;
       entry.querySelector('input[name^="cpf"]').value = client.cpf;
+      entry.querySelector('input[name^="nascimento"]').value = toInputDate(client.dataNascimento);
+      entry.querySelector('input[name^="idade"]').value = client.idade || "";
     }
     for (const [field] of FIELDS) {
       const input = byId(field);
@@ -263,14 +271,20 @@
     const entry = document.createElement("div");
     entry.className = "client-entry";
     const index = clientIndex++;
-    for (const [id, label] of [["nome", "Nome"], ["cpf", "CPF ou RG"]]) {
+    for (const [id, label, type] of [
+      ["nome", "Nome", "text"],
+      ["cpf", "CPF ou RG", "text"],
+      ["nascimento", "Data de nascimento", "date"],
+      ["idade", "Idade (anos)", "number"]
+    ]) {
       const group = document.createElement("div");
       group.className = "form-group";
       const labelEl = document.createElement("label");
       labelEl.htmlFor = id + index;
       labelEl.textContent = label + " (opcional)";
       const input = document.createElement("input");
-      input.type = "text";
+      input.type = type;
+      if (id === "idade") { input.min = "0"; input.max = "120"; }
       input.id = id + index;
       input.name = id + index;
       group.append(labelEl, input);

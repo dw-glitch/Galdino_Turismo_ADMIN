@@ -596,3 +596,38 @@ button:disabled { opacity: .6; cursor: wait; transform: none; }
 #observacoes { box-sizing: border-box; width: 100%; min-height: 80px; font: inherit; padding: 12px; border: 1px solid #d4bd85; border-radius: 8px; resize: vertical; }
 #observacoes:focus { outline: 3px solid rgba(200,160,67,.18); }
 #voucherPreview .not-provided, .voucher-export .not-provided { color: #8793a2; font-style: italic; }
+
+/* Dados completos dos passageiros — mesmo layout em ambos os modos. */
+#voucherPreview .clients-table,
+.voucher-export .clients-table {
+    table-layout: fixed;
+    width: 100%;
+    font-size: .86em;
+}
+#voucherPreview .clients-table th,
+#voucherPreview .clients-table td,
+.voucher-export .clients-table th,
+.voucher-export .clients-table td {
+    overflow-wrap: anywhere;
+    padding: 9px 7px;
+    vertical-align: top;
+}
+#voucherPreview .clients-table th:first-child,
+.voucher-export .clients-table th:first-child { width: 36%; }
+#voucherPreview .clients-table th:nth-child(2),
+.voucher-export .clients-table th:nth-child(2) { width: 26%; }
+#voucherPreview .clients-table th:nth-child(3),
+.voucher-export .clients-table th:nth-child(3) { width: 24%; }
+#voucherPreview .clients-table th:last-child,
+.voucher-export .clients-table th:last-child { width: 14%; }
+#voucherPreview .clients-table th,
+.voucher-export .clients-table th {
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: .88em;
+}
+@media (max-width: 500px) {
+    #voucherPreview .clients-table { font-size: .70em; }
+    #voucherPreview .clients-table th,
+    #voucherPreview .clients-table td { padding: 5px 3px; }
+}

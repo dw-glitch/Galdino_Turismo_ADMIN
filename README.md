@@ -46,3 +46,29 @@ node --test tests/voucher-v2.test.cjs
 Nenhum workflow do GitHub Actions é necessário para testar ou usar o app.
 
 Os arquivos `index.html`, `styles.css`, `voucher-parser.js` e `voucher-v2.js` compõem a versão nova. O `script.js` original foi mantido apenas como referência histórica e não é mais carregado pelo site.
+
+## Listas de passageiros sem rótulos
+
+O modo **Colar informações** entende blocos como:
+```text
+ANA BEATRIZ ALMEIDA
+CPF 123.456.789-00                   07/02/1986
+
+CARLOS MARQUES DE SOUZA
+CPF 234.567.890-11
+03/03/1977
+
+LARA MARTINS ALMEIDA
+CPF 456.789.012-33
+27/03/2013 – 13 anos
+
+Saída de Maceió para Porto de Galinhas
+Motorista Zé
+```
+*Os dados acima são fictícios e servem apenas como exemplos.*
+
+O sistema associa CPF e data de nascimento ao último passageiro reconhecido, mesmo quando os dados estão separados por espaços e linhas em branco. Também entende nascimento e idade juntos, nomes maiúsculos sem "Nome:", CPF sem pontuação ou rótulo em listas de passageiros, e nome/CPF/nascimento na mesma linha.
+
+**O voucher tradicional foi ampliado:** a tabela de clientes também mostra nascimento e idade; a seção de transporte informa origem e destino. Essas informações aparecem igualmente no formulário manual, e não são acrescentadas como texto solto. Quando o número de passageiros não é fornecido, é usado o total de pessoas identificadas. A quantidade de crianças **não é deduzida automaticamente** a partir da idade porque os critérios variam conforme o serviço.
+
+A interpretação é local e não publica os dados colados no repositório. Trechos duvidosos seguem para conferência. Não se deve assumir que qualquer mensagem em linguagem livre será compreendida sem revisão.
