@@ -23,14 +23,14 @@
             <h3 id="quickModeTitle">Cole as informações da reserva</h3>
             <p>O sistema identifica os dados da reserva e preenche automaticamente o <strong>mesmo modelo de voucher do formulário manual</strong>. Informações não disponíveis aparecem como “Não informado”.</p>
             <label for="quickText">Informações para o voucher</label>
-            <textarea id="quickText" rows="10" spellcheck="false" placeholder="Cliente: Maria Silva
-CPF: 000.000.000-00
-Hotel: Pousada Exemplo
-Data de chegada: 10/11/2026
-Voo de chegada: AD1234
-Motorista: João
-Observações: Transfer aeroporto / hotel"></textarea>
-            <p class="helper-text">Pode colar mensagens informais do WhatsApp. Confira a prévia padronizada abaixo antes de baixar.</p>
+            <textarea id="quickText" rows="10" spellcheck="false" placeholder="MARIA SILVA OLIVEIRA
+CPF 000.000.000-00     10/02/1990
+JOÃO COSTA OLIVEIRA
+CPF 111.111.111-11
+12/03/1988
+Saída de Maceió para Porto de Galinhas
+Motorista Zé"></textarea>
+            <p class="helper-text">Pode colar listas de passageiros sem rótulos, CPF sem dois-pontos, datas de nascimento, idades, trajetos e mensagens informais. Confira a prévia antes de baixar.</p>
             <p id="quickSummary" class="extraction-summary" role="status" aria-live="polite"></p>
             <details id="quickReview" class="quick-review" hidden>
                 <summary>Trechos que precisam de conferência</summary>
@@ -108,6 +108,14 @@ Observações: Transfer aeroporto / hotel"></textarea>
             <div class="form-section">
                 <h3>Informações do Transporte</h3>
                 <div class="form-group">
+                    <label for="origem">Origem do transporte:</label>
+                    <input type="text" id="origem" name="origem" placeholder="Ex.: Maceió">
+                </div>
+                <div class="form-group">
+                    <label for="destino">Destino do transporte:</label>
+                    <input type="text" id="destino" name="destino" placeholder="Ex.: Porto de Galinhas">
+                </div>
+                <div class="form-group">
                     <label for="nomeMotorista">Nome do Motorista:</label>
                     <input type="text" id="nomeMotorista" name="nomeMotorista">
                 </div>
@@ -168,6 +176,8 @@ Observações: Transfer aeroporto / hotel"></textarea>
             <div class="voucher-section" id="transportSection">
                 <h4>Informações do Transporte</h4>
                 <div class="voucher-info">
+                    <p><strong>Origem:</strong> <span id="previewOrigem"></span></p>
+                    <p><strong>Destino:</strong> <span id="previewDestino"></span></p>
                     <p><strong>Nome do Motorista:</strong> <span id="previewNomeMotorista"></span></p>
                     <p><strong>Placa do Carro:</strong> <span id="previewPlacaCarro"></span></p>
                     <p><strong>Telefone/Contato:</strong> <span id="previewTelefoneMotorista"></span></p>
