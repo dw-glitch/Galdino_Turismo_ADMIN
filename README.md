@@ -20,12 +20,18 @@ Motorista: João
 Observações: Transfer do aeroporto para o hotel
 ```
 
-**Informações opcionais:** qualquer um dos dados de cliente, CPF/RG, datas, voos, hospedagem, pagamento ou transporte pode faltar. Se uma seção estiver vazia, ela é omitida do voucher. Linhas não reconhecidas aparecem em **Informações adicionais**, para que as informações fornecidas não sejam perdidas. O sistema **não inventa dados nem corrige informações sem confirmação**.
+**Modelo tradicional fixo:** o modo automático usa exatamente o mesmo voucher que o questionário manual, com cabeçalho, logo, tabela de clientes, informações de voo, hospedagem e transporte. Todas as seções continuam visíveis. Os campos ausentes mostram **Não informado**, mas não impedem gerar o PNG.
+
+**Extração automática:** são reconhecidos dados com rótulos e frases comuns, como `Chegada: 10/11/2026`, `Voo de chegada: AD2046 às 14h30`, `Ficaremos no Hotel Mar Azul de 10/11/2026 até 15/11/2026`, `Pax: 2 adultos e 1 criança`, motorista, placa e contato. A extração roda localmente, sem envio a serviços externos.
+
+**Conferência:** trechos não reconhecidos ou contraditórios ficam na seção **Trechos que precisam de conferência**, fora do voucher. Isso evita que textos avulsos sejam transformados em dados incorretos. Use o botão **Conferir / ajustar** para preencher automaticamente o formulário tradicional com o que foi identificado e corrigir somente o necessário. A seção de **Observações** no voucher é usada quando o texto identifica explicitamente observações. Dados ausentes não são inventados.
+
+**Limite:** reconhecimento automático por regras não interpreta todo tipo de texto livre. Quando houver dúvida, a informação será sinalizada para revisão, e não atribuída arbitrariamente a um campo.
 
 Também é possível copiar vários clientes: `Clientes: Ana Silva; João Costa`. Use um campo por linha (por exemplo, `Hotel: ...`) para obter a melhor extração possível. O interpretador usa regras locais e não depende de IA ou de envio de informações pessoais para um servidor.
 
 ## Modo manual
-Clique em **Preencher manualmente** para usar o questionário antigo, agora com todos os campos opcionais. É necessário apenas que alguma informação esteja preenchida para emitir o voucher.
+Clique em **Preencher manualmente** para usar o questionário tradicional. Todos os campos são opcionais. O botão **Conferir / ajustar**, no modo rápido, abre esse mesmo formulário já preenchido com os dados reconhecidos. Em ambos os modos, o PNG usa a mesma prévia e o mesmo layout.
 
 ## Exportação
 O botão gera **PNG**. A biblioteca html2canvas é carregada pela CDN já utilizada anteriormente pelo projeto e, por isso, precisa estar acessível para baixar a imagem. A prévia pode ser vista sem ela.
@@ -39,4 +45,4 @@ node --test tests/voucher-v2.test.cjs
 
 Nenhum workflow do GitHub Actions é necessário para testar ou usar o app.
 
-Os arquivos `index.html`, `styles.css` e `voucher-v2.js` compõem a versão nova. O `script.js` original foi mantido apenas como referência histórica e não é mais carregado pelo site.
+Os arquivos `index.html`, `styles.css`, `voucher-parser.js` e `voucher-v2.js` compõem a versão nova. O `script.js` original foi mantido apenas como referência histórica e não é mais carregado pelo site.

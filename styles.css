@@ -587,3 +587,12 @@ button:disabled { opacity: .6; cursor: wait; transform: none; }
     body, main { background: white; padding: 0; margin: 0; box-shadow: none; }
     #voucherPreview { display: block !important; margin: 0; }
 }
+
+/* Modo automático: reconhecimento em campos, mantendo o voucher padrão. */
+.extraction-summary { margin: 14px 0 8px; color: #205c51; font-weight: 600; line-height: 1.5; }
+.quick-review { border: 1px solid #d9e1e9; border-radius: 9px; padding: 12px 14px; background: #f7f9fc; margin: 8px 0 0; }
+.quick-review summary { cursor: pointer; font-weight: 600; color: #0C233F; }
+.quick-review pre { white-space: pre-wrap; overflow-wrap: anywhere; font: inherit; font-size: .9rem; color: #526174; margin: 8px 0 0; }
+#observacoes { box-sizing: border-box; width: 100%; min-height: 80px; font: inherit; padding: 12px; border: 1px solid #d4bd85; border-radius: 8px; resize: vertical; }
+#observacoes:focus { outline: 3px solid rgba(200,160,67,.18); }
+#voucherPreview .not-provided, .voucher-export .not-provided { color: #8793a2; font-style: italic; }
