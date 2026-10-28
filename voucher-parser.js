@@ -350,7 +350,7 @@
     for (let i = 0; i < lines.length; i++) {
       const original = lines[i];
       const line = clean(original.replace(/^\[\d{1,2}\/\d{1,2}\/\d{2,4},?\s*\d{1,2}:\d{2}\]\s*[^:]{1,35}:\s*/, "")
-        .replace(/^(?:[-*•📌✅✈️🏨👤📅📍🚗]\s*|\d+[.)]\s*)/, ""));
+        .replace(/^(?:[-*•📌✅✈️🏨👤📅📍🚗]\s*|\d+[.)]\s+)/, ""));
       if (!line) continue;
       // Lista de passageiros sem questionário: nome em uma linha, CPF e nascimento
       // em outras (ou na mesma linha) não podem ser classificados como texto avulso.
