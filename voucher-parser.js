@@ -149,8 +149,12 @@
       if (/^(?:n[uú]mero de passageiros|numero passageiros|total de passageiros|total de pessoas|qtd de passageiros|qtd passageiros|qtd pessoas|pax|passageiros|quantidade de passageiros|quantidade de pessoas)$/.test(key)) {
         const qty = /(\d+)/.exec(val);
         if (qty) {
-          assign("numeroPassageiros", qty[1], label);
-          const kids = /(\d+)\s*(?:criancas?|menores|bebes)/.exec(normalize(val));
+          const normalized = normalize(val);
+          const adults = /(\d+)\s*adultos?/.exec(normalized);
+          const kids = /(\d+)\s*(?:criancas?|menores|bebes?)/.exec(normalized);
+          // "Pax: 2 adultos e 1 criança" descreve três viajantes, não dois.
+          const count = adults && kids ? String(+adults[1] + +kids[1]) : qty[1];
+          assign("numeroPassageiros", count, label);
           if (kids) assign("numeroCriancas", kids[1], label);
           return true;
         }
