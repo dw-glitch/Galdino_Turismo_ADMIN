@@ -118,3 +118,31 @@ test("não valida datas impossíveis nem as inventa", () => {
   assert.equal(data.fields.dataChegada, undefined);
   assert.ok(data.warnings.length > 0);
 });
+
+test("texto de WhatsApp sem rótulos rígidos identifica cliente e hospedagem", () => {
+  const client = parseQuickText("Reserva para Maria Silva.");
+  assert.equal(client.clients[0].nome, "Maria Silva");
+  const stay = parseQuickText("Ficaremos no Hotel Mar Azul de 15/11/2026 até 20/11/2026");
+  assert.equal(stay.fields.hotel, "Hotel Mar Azul");
+  assert.equal(stay.fields.dataChegada, "15/11/2026");
+  assert.equal(stay.fields.dataSaida, "20/11/2026");
+});
+
+test("voo e horário sem contexto não são atribuídos ao trecho errado", () => {
+  const data = parseQuickText("Voo: AD1234");
+  assert.equal(data.fields.numeroVooChegada, undefined);
+  assert.equal(data.fields.numeroVooPartida, undefined);
+  assert.ok(data.warnings.length > 0);
+});
+
+test("voo e horário com contexto da chegada preenchem o padrão", () => {
+  const data = parseQuickText("Chegada: 15/11/2026\nVoo: AD1234\nHorário: 14h30");
+  assert.equal(data.fields.numeroVooChegada, "AD1234");
+  assert.equal(data.fields.horaVooChegada, "14:30");
+});
+
+test("pax com adultos e crianças informa o total corretamente", () => {
+  const data = parseQuickText("Pax: 2 adultos e 1 criança");
+  assert.equal(data.fields.numeroPassageiros, "3");
+  assert.equal(data.fields.numeroCriancas, "1");
+});
