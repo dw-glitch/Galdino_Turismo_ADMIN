@@ -16,7 +16,7 @@
 
   const DATE = /\b(?:([0-3]?\d)[\/.-]([01]?\d)[\/.-](\d{2}|\d{4})|(\d{4})-([01]?\d)-([0-3]?\d))\b/;
   const TIME = /\b((?:[01]?\d|2[0-3]))\s*(?:[:hH])\s*([0-5]\d)?\b/;
-  const FLIGHT = /\b([A-Z]{1,3}\s?-?\d{2,5})\b/i;
+  const FLIGHT = /\b([A-Z][A-Z0-9]{1,2}\s?-?\d{2,5})\b/i;
   const PLATE = /\b([A-Z]{3}[- ]?\d[A-Z0-9]\d{2}|[A-Z]{3}[- ]?\d{4})\b/i;
   const PHONE = /(?:\+?55[\s()-]*)?(?:\(?\d{2}\)?[\s-]*)?9?\d{4}[\s-]?\d{4}\b/;
   const LABEL_SPLIT = /(?:\s+\|\s+|;\s*|\s+-\s+)(?=(?:nome|cliente|cpf|rg|documento|hotel|pousada|motorista|placa|voo|data|chegada|sa[ií]da|partida|volta|ida|telefone|contato|pagamento|check[\s-]?(?:in|out)|passageiros|crian[cç]as|observa[cç][oõ]es)\b\s*[:=])/gi;
@@ -122,7 +122,7 @@
       }
       notesMode = false;
       if (/^(?:observacoes?|informacoes adicionais|detalhes adicionais|observacao|obs|servicos inclusos)$/.test(key)) {
-        result.notes.push(val); return true;
+        result.notes.push(val); notesMode = true; return true;
       }
       if (/^nome (?:do |da )?motorista$|^(?:motorista|condutor)(?: responsavel)?$/.test(key)) {
         assign("nomeMotorista", val, label); return true;
@@ -230,6 +230,13 @@
       if (m) { assign("nomeMotorista", m[1], "motorista"); section = "transport"; return true; }
       m = /(?:placa\s*(?:do carro|do veiculo)?\s*:?[\s-]*)([A-Z]{3}[- ]?\d[A-Z0-9]\d{2}|[A-Z]{3}[- ]?\d{4})\b/i.exec(line);
       if (m) { assign("placaCarro", m[1], "placa"); return true; }
+      // Sem rótulo: "2 adultos + 1 criança" ou "2 adultos e 1 criança".
+      m = /^(\d+)\s+adultos?\s*(?:\+|e)\s*(\d+)\s+(?:criancas?|menores|bebes?)$/.exec(n);
+      if (m) {
+        assign("numeroPassageiros", String(+m[1] + +m[2]), "total de viajantes");
+        assign("numeroCriancas", m[2], "crianças");
+        return true;
+      }
       if (/^(?:pagamento\s+)?(?:pago|quitado|pendente|nao pago|em aberto)$/i.test(n)) {
         setPayment(n); return true;
       }
