@@ -356,6 +356,18 @@
       // em outras (ou na mesma linha) não podem ser classificados como texto avulso.
       // Evita interpretar nomes de hotéis, destinos, voos e motorista como passageiros.
       if (!notesMode) {
+        // Variação frequente: "NOME COMPLETO - CPF 000.000.000-00 - 10/02/1990"
+        // ou "Nome: Maria Silva CPF: 000.000.000-00".
+        const inlinePerson = /^(?:(?:nome|cliente|passageiro|h[oó]spede)\s*[:=-]\s*)?([\p{L}][\p{L}\s.'’-]{3,110}?)\s*(?:[-–—]\s*)?(?:CPF|RG)\s*[:=-]?\s*(\d{3}[.\s]?\d{3}[.\s]?\d{3}[-.\s]?\d{2}|\d{11}|\d{4,12})\b/iu.exec(line);
+        if (inlinePerson &&
+            !/\b(?:hotel|pousada|resort|motorista|placa|destino|origem|transfer)\b/i.test(normalize(inlinePerson[1]))) {
+          addClient(inlinePerson[1], inlinePerson[2]);
+          const tail = line.slice(inlinePerson[0].length);
+          if (DATE.test(tail)) setBirthDate(tail);
+          else if (tail.trim() && !/^[\s,;–—-]+$/.test(tail)) result.unrecognized.push(tail.trim());
+          section = "clients";
+          continue;
+        }
         const cpfLine = /^(?:CPF|CPF\s*\/\s*RG)\s*[:=\-]?\s*(\d{3}[.\s]?\d{3}[.\s]?\d{3}[-.\s]?\d{2}|\d{11})\b/i.exec(line);
         const rgLine = /^RG\s*[:=\-]?\s*([\d.\-]{4,20})/i.exec(line);
         if (cpfLine || rgLine) {
