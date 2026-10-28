@@ -177,6 +177,21 @@
         if (!extractJourney(val, "departure", label)) result.warnings.push("Saída sem data/voo reconhecido: " + val);
         section = "departure"; return true;
       }
+      if (/^(?:voo|numero do voo|numero voo)$/.test(key)) {
+        const valNormal = normalize(val);
+        const direction = /\b(?:chegada|ida)\b/.test(valNormal) ? "arrival" :
+          /\b(?:partida|volta|saida|retorno)\b/.test(valNormal) ? "departure" : section;
+        if (direction === "arrival" || direction === "departure") extractJourney(val, direction, label);
+        else result.warnings.push("Voo sem indicação de chegada ou partida: " + val);
+        return true;
+      }
+      if (/^(?:horario|hora|horario do voo|hora do voo)$/.test(key)) {
+        const time = timeFrom(val);
+        if (time && (section === "arrival" || section === "departure")) {
+          assign(section === "arrival" ? "horaVooChegada" : "horaVooPartida", time, label);
+        } else result.warnings.push("Horário sem referência de chegada ou partida: " + val);
+        return true;
+      }
       if (/^(?:numero (?:do )?voo (?:de |da )?(?:chegada|ida)|voo (?:de |da )?(?:chegada|ida)|voo ida|numero voo ida|voo chegada|voo de entrada)$/.test(key)) {
         if (!extractJourney(val, "arrival", label)) result.warnings.push("Voo de chegada não reconhecido: " + val);
         section = "arrival"; return true;
@@ -222,11 +237,32 @@
       if (section === "clients" && /^[\p{L}][\p{L}\s.'-]{2,100}$/u.test(line) && !/hotel|voo|transfer|pagamento|saida|chegada/i.test(line)) {
         addClient(line, ""); return true;
       }
+      m = /\b(?:reserva (?:em nome de|para)|passageiro|cliente|hospede)\s+([\p{Lu}][\p{L}.'-]+(?:\s+[\p{Lu}][\p{L}.'-]+){1,4})(?=[,.]|$)/u.exec(line);
+      if (m) {
+        addClient(m[1], "");
+        // Se a mesma frase informar o hotel, o trecho seguinte será avaliado separadamente.
+        const after = line.slice(m.index + m[0].length).replace(/^[.,;\s]+/, "");
+        if (after) processNatural(after);
+        return true;
+      }
       m = /^(.{3,80}?)\s*[-–]\s*(?:cpf|rg)\s*:?\s*([\d.\-/]+)$/i.exec(line);
       if (m) { addClient(m[1], m[2]); return true; }
-      m = /^(?:ficaremos no |hospedagem no |reserva no )?(hotel|pousada|resort)\s+(.+)$/i.exec(line);
-      if (m) { assign("hotel", m[1] + " " + m[2], "hospedagem"); section = ""; return true; }
-      m = /^(?:motorista|condutor)\s+([\p{L}][\p{L}\s.'-]+)$/iu.exec(line);
+      // "Ficaremos no Hotel Mar Azul de 10/11/2026 até 15/11/2026".
+      const stay = /\b(?:hotel|pousada|resort)\b.*?\b(\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4})\s*(?:a|ate|até|-|e)\s*(\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4})/i.exec(line);
+      if (stay) {
+        assign("dataChegada", dateFrom(stay[1]), "início da hospedagem");
+        assign("dataSaida", dateFrom(stay[2]), "fim da hospedagem");
+      }
+      m = /^(?:ficaremos no |hospedagem no |reserva no |(?:vamos ficar|ficaremos) (?:no|na) )?(hotel|pousada|resort)\s+(.+)$/i.exec(line);
+      if (m) {
+        const hotelName = m[2].replace(/\s+(?:de|entre)\s+\d{1,2}[\/.-]\d{1,2}[\/.-]\d{2,4}.*$/i, "").replace(/[.,;]+$/, "").trim();
+        assign("hotel", m[1] + " " + hotelName, "hospedagem");
+        section = ""; return true;
+      }
+      m = /\b(?:no|na)\s+(hotel|pousada|resort)\s+([^,.]+?)(?=\s+(?:de|entre)\s+\d{1,2}[\/.-]|[,.]|$)/i.exec(line);
+      if (m) { assign("hotel", m[1] + " " + clean(m[2]), "hospedagem"); return true; }
+      m = /\b(?:motorista|condutor)\s+(?:(?:e|sera|vai ser|é|será)\s+)?([\p{L}][\p{L}\s.'-]+?)(?=[,.]|$)/iu.exec(line);
+      if (m && /^(?:a definir|confirmado|informado depois|nao informado)$/i.test(normalize(m[1]))) m = null;
       if (m) { assign("nomeMotorista", m[1], "motorista"); section = "transport"; return true; }
       m = /(?:placa\s*(?:do carro|do veiculo)?\s*:?[\s-]*)([A-Z]{3}[- ]?\d[A-Z0-9]\d{2}|[A-Z]{3}[- ]?\d{4})\b/i.exec(line);
       if (m) { assign("placaCarro", m[1], "placa"); return true; }
