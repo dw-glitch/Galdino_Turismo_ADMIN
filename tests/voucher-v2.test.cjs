@@ -146,3 +146,68 @@ test("pax com adultos e crianças informa o total corretamente", () => {
   assert.equal(data.fields.numeroPassageiros, "3");
   assert.equal(data.fields.numeroCriancas, "1");
 });
+
+
+test("lista com 5 viajantes, CPF e nascimento em linhas livres", () => {
+  // Exemplo fictício, sem dados reais de passageiros.
+  const data = parseQuickText([
+    "ANA BEATRIZ ALMEIDA",
+    "CPF 123.456.789-00                         07/02/1986",
+    "",
+    "CARLOS MARQUES DE SOUZA",
+    "CPF 234.567.890-11",
+    "03/03/1977",
+    "",
+    "RAIMUNDO COSTA DA SILVA",
+    "CPF 345.678.901-22",
+    "15/03/1961 – 65 anos",
+    "",
+    "LARA MARTINS ALMEIDA",
+    "CPF 456.789.012-33                     27/03/2013 – 13 anos",
+    "",
+    "LUIZA ALMEIDA MARQUES DE SOUZA",
+    "CPF 567.890.123-44",
+    "27/03/2024 – 2 anos",
+    "Saída de Maceió para Porto de galinhas",
+    "Motorista Zé"
+  ].join("\n"));
+  assert.equal(data.clients.length, 5);
+  assert.equal(data.fields.numeroPassageiros, "5");
+  assert.equal(data.clients[0].nome, "ANA BEATRIZ ALMEIDA");
+  assert.equal(data.clients[0].cpf, "123.456.789-00");
+  assert.equal(data.clients[0].dataNascimento, "07/02/1986");
+  assert.equal(data.clients[1].dataNascimento, "03/03/1977");
+  assert.equal(data.clients[2].idade, "65");
+  assert.equal(data.clients[3].idade, "13");
+  assert.equal(data.clients[4].idade, "2");
+  assert.equal(data.fields.origem, "Maceió");
+  assert.equal(data.fields.destino, "Porto de galinhas");
+  assert.equal(data.fields.nomeMotorista, "Zé");
+  assert.equal(data.unrecognized.length, 0);
+  assert.equal(data.warnings.length, 0);
+});
+
+test("reconhece nome CPF e nascimento na mesma linha sem questionário", () => {
+  const data = parseQuickText("Nome: Maria Silva CPF: 123.456.789-00 07/02/1986");
+  assert.equal(data.clients[0].nome, "Maria Silva");
+  assert.equal(data.clients[0].cpf, "123.456.789-00");
+  assert.equal(data.clients[0].dataNascimento, "07/02/1986");
+});
+
+test("não confunde deslocamento terrestre com voo de partida", () => {
+  const data = parseQuickText("Saída de Maceió para Porto de Galinhas\nMotorista Zé");
+  assert.equal(data.fields.origem, "Maceió");
+  assert.equal(data.fields.destino, "Porto de Galinhas");
+  assert.equal(data.fields.nomeMotorista, "Zé");
+  assert.equal(data.fields.dataSaida, undefined);
+  assert.equal(data.fields.numeroVooPartida, undefined);
+});
+
+test("mantém nascimento idade e trajeto também no modelo manual", () => {
+  for (const id of ["origem", "destino", "previewOrigem", "previewDestino"]) {
+    assert.ok(html.includes('id="' + id + '"'));
+  }
+  assert.ok(appCode.includes('["nascimento", "Data de nascimento", "date"]'));
+  assert.ok(appCode.includes('["idade", "Idade (anos)", "number"]'));
+  assert.ok(appCode.includes('["Nome Completo", "CPF ou RG", "Nascimento", "Idade"]'));
+});
