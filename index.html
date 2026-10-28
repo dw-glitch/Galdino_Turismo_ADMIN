@@ -21,7 +21,7 @@
         </div>
         <section id="quickMode" class="quick-panel" aria-labelledby="quickModeTitle">
             <h3 id="quickModeTitle">Cole as informações da reserva</h3>
-            <p>Cole uma mensagem, os dados recebidos pelo WhatsApp ou seu resumo de viagem. Nenhum campo é obrigatório.</p>
+            <p>O sistema identifica os dados da reserva e preenche automaticamente o <strong>mesmo modelo de voucher do formulário manual</strong>. Informações não disponíveis aparecem como “Não informado”.</p>
             <label for="quickText">Informações para o voucher</label>
             <textarea id="quickText" rows="10" spellcheck="false" placeholder="Cliente: Maria Silva
 CPF: 000.000.000-00
@@ -30,10 +30,16 @@ Data de chegada: 10/11/2026
 Voo de chegada: AD1234
 Motorista: João
 Observações: Transfer aeroporto / hotel"></textarea>
-            <p class="helper-text">Dados reconhecidos entram nas seções correspondentes. O restante aparece em Informações adicionais, sem perder o texto e sem inventar informações ausentes.</p>
+            <p class="helper-text">Pode colar mensagens informais do WhatsApp. Confira a prévia padronizada abaixo antes de baixar.</p>
+            <p id="quickSummary" class="extraction-summary" role="status" aria-live="polite"></p>
+            <details id="quickReview" class="quick-review" hidden>
+                <summary>Trechos que precisam de conferência</summary>
+                <p class="helper-text">Esses trechos não foram colocados automaticamente no voucher para evitar informações no campo errado. Você pode completar ou corrigir os dados pelo formulário.</p>
+                <pre id="quickUnrecognized"></pre>
+            </details>
             <div class="action-row">
                 <button id="generateQuickVoucher" type="button">Gerar voucher PNG</button>
-                <button id="previewQuickVoucher" type="button" class="secondary-button">Ver prévia</button>
+                <button id="previewQuickVoucher" type="button" class="secondary-button">Conferir / ajustar</button>
             </div>
         </section>
         <section id="manualMode" hidden aria-label="Preenchimento manual">
@@ -115,6 +121,10 @@ Observações: Transfer aeroporto / hotel"></textarea>
                 </div>
             </div>
 
+            <div class="form-group">
+                <label for="observacoes">Observações (opcional):</label>
+                <textarea id="observacoes" name="observacoes" rows="3" placeholder="Informações adicionais que devem aparecer no voucher"></textarea>
+            </div>
             <button type="button" id="generatePDF">Gerar Voucher PNG</button>
         </form>
         </section>
@@ -174,6 +184,7 @@ Observações: Transfer aeroporto / hotel"></textarea>
         </div>
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="voucher-parser.js"></script>
     <script src="voucher-v2.js"></script>
 </body>
 </html>
