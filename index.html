@@ -14,6 +14,30 @@
     </header>
     <main>
         <h2>Voucher de Turismo</h2>
+        <p class="page-intro">Crie vouchers padronizados sem digitar tudo novamente.</p>
+        <div class="mode-switch" role="group" aria-label="Escolha como criar o voucher">
+            <button type="button" data-mode="quick" class="is-active" aria-pressed="true">Colar informações</button>
+            <button type="button" data-mode="manual" aria-pressed="false">Preencher manualmente</button>
+        </div>
+        <section id="quickMode" class="quick-panel" aria-labelledby="quickModeTitle">
+            <h3 id="quickModeTitle">Cole as informações da reserva</h3>
+            <p>Cole uma mensagem, os dados recebidos pelo WhatsApp ou seu resumo de viagem. Nenhum campo é obrigatório.</p>
+            <label for="quickText">Informações para o voucher</label>
+            <textarea id="quickText" rows="10" spellcheck="false" placeholder="Cliente: Maria Silva
+CPF: 000.000.000-00
+Hotel: Pousada Exemplo
+Data de chegada: 10/11/2026
+Voo de chegada: AD1234
+Motorista: João
+Observações: Transfer aeroporto / hotel"></textarea>
+            <p class="helper-text">Dados reconhecidos entram nas seções correspondentes. O restante aparece em Informações adicionais, sem perder o texto e sem inventar informações ausentes.</p>
+            <div class="action-row">
+                <button id="generateQuickVoucher" type="button">Gerar voucher PNG</button>
+                <button id="previewQuickVoucher" type="button" class="secondary-button">Ver prévia</button>
+            </div>
+        </section>
+        <section id="manualMode" hidden aria-label="Preenchimento manual">
+            <p class="helper-text">Preencha somente os campos que tiver. Todos são opcionais.</p>
         <form id="voucherForm">
             <div class="form-section">
                 <h3>Dados dos Clientes</h3>
@@ -27,35 +51,35 @@
                 <h3>Informações do Voo</h3>
                 <div class="form-group">
                     <label for="numeroPassageiros">Número de Passageiros:</label>
-                    <input type="number" id="numeroPassageiros" name="numeroPassageiros" required min="1">
+                    <input type="number" id="numeroPassageiros" name="numeroPassageiros" min="1">
                 </div>
                 <div class="form-group">
                     <label for="numeroCriancas">Número de Crianças:</label>
-                    <input type="number" id="numeroCriancas" name="numeroCriancas" required min="0">
+                    <input type="number" id="numeroCriancas" name="numeroCriancas" min="0">
                 </div>
                 <div class="form-group">
                     <label for="dataChegada">Data de Chegada:</label>
-                    <input type="date" id="dataChegada" name="dataChegada" required>
+                    <input type="date" id="dataChegada" name="dataChegada">
                 </div>
                 <div class="form-group">
                     <label for="numeroVooChegada">Número do Voo de Chegada:</label>
-                    <input type="text" id="numeroVooChegada" name="numeroVooChegada" required>
+                    <input type="text" id="numeroVooChegada" name="numeroVooChegada">
                 </div>
                 <div class="form-group">
                     <label for="horaVooChegada">Horario de Previsão de Chegada:</label>
-                    <input type="time" id="horaVooChegada" name="horaVooChegada" required>
+                    <input type="time" id="horaVooChegada" name="horaVooChegada">
                 </div>
                 <div class="form-group">
                     <label for="dataSaida">Data de Saída:</label>
-                    <input type="date" id="dataSaida" name="dataSaida" required>
+                    <input type="date" id="dataSaida" name="dataSaida">
                 </div>
                 <div class="form-group">
                     <label for="numeroVooPartida">Número do Voo de Partida:</label>
-                    <input type="text" id="numeroVooPartida" name="numeroVooPartida" required>
+                    <input type="text" id="numeroVooPartida" name="numeroVooPartida">
                 </div>
                 <div class="form-group">
                     <label for="horaVooPartida">Horário do Voo de Partida:</label>
-                    <input type="time" id="horaVooPartida" name="horaVooPartida" required>
+                    <input type="time" id="horaVooPartida" name="horaVooPartida">
                 </div>
             </div>
 
@@ -63,11 +87,11 @@
                 <h3>Hospedagem</h3>
                 <div class="form-group">
                     <label for="hotel">Nome do Hotel:</label>
-                    <input type="text" id="hotel" name="hotel" required>
+                    <input type="text" id="hotel" name="hotel">
                 </div>
                 <div class="form-group">
                     <label for="pago">Status do Pagamento:</label>
-                    <select id="pago" name="pago" required>
+                    <select id="pago" name="pago">
                         <option value="">Selecione</option>
                         <option value="Pago">Pago</option>
                         <option value="Pendente">Pendente</option>
@@ -79,35 +103,37 @@
                 <h3>Informações do Transporte</h3>
                 <div class="form-group">
                     <label for="nomeMotorista">Nome do Motorista:</label>
-                    <input type="text" id="nomeMotorista" name="nomeMotorista" required>
+                    <input type="text" id="nomeMotorista" name="nomeMotorista">
                 </div>
                 <div class="form-group">
                     <label for="placaCarro">Número da Placa do Carro:</label>
-                    <input type="text" id="placaCarro" name="placaCarro" required>
+                    <input type="text" id="placaCarro" name="placaCarro">
                 </div>
                 <div class="form-group">
                     <label for="telefoneMotorista">Telefone / Contato do Motorista:</label>
-                    <input type="text" id="telefoneMotorista" name="telefoneMotorista" required>
+                    <input type="text" id="telefoneMotorista" name="telefoneMotorista">
                 </div>
             </div>
 
             <button type="button" id="generatePDF">Gerar Voucher PNG</button>
         </form>
-        <div id="voucherPreview" style="display: none;">
+        </section>
+        <p id="voucherStatus" class="voucher-status" role="status" aria-live="polite"></p>
+        <div id="voucherPreview" hidden>
             <div class="voucher-header">
                 <img src="logo.png" alt="Logo Galdino Turismo" class="voucher-logo">
                 <h3>Voucher de Turismo - Galdino Turismo</h3>
                 <p class="voucher-date">Data de Emissão: <span id="previewDataEmissao"></span></p>
             </div>
 
-            <div class="voucher-section">
+            <div class="voucher-section" id="clientsSection">
                 <h4>Dados dos Clientes</h4>
                 <div id="previewClients" class="voucher-info">
                     <!-- Clients will be listed here -->
                 </div>
             </div>
 
-            <div class="voucher-section">
+            <div class="voucher-section" id="flightsSection">
                 <h4>Informações do Voo</h4>
                 <div class="voucher-info">
                     <p><strong>Número de Passageiros:</strong> <span id="previewPassageiros"></span></p>
@@ -121,7 +147,7 @@
                 </div>
             </div>
 
-            <div class="voucher-section">
+            <div class="voucher-section" id="hotelSection">
                 <h4>Hospedagem</h4>
                 <div class="voucher-info">
                     <p><strong>Hotel:</strong> <span id="previewHotel"></span></p>
@@ -129,7 +155,7 @@
                 </div>
             </div>
 
-            <div class="voucher-section">
+            <div class="voucher-section" id="transportSection">
                 <h4>Informações do Transporte</h4>
                 <div class="voucher-info">
                     <p><strong>Nome do Motorista:</strong> <span id="previewNomeMotorista"></span></p>
@@ -138,12 +164,16 @@
                 </div>
             </div>
 
+            <div class="voucher-section" id="notesSection" hidden>
+                <h4>Informações adicionais</h4>
+                <p id="previewNotes" class="voucher-notes"></p>
+            </div>
             <div class="voucher-footer">
                 <p>Telefone: (81) 9751-7571 | Galdino Turismo - Sua viagem dos sonhos começa aqui</p>
             </div>
         </div>
     </main>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="script.js"></script>
+    <script src="voucher-v2.js"></script>
 </body>
 </html>
