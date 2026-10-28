@@ -286,7 +286,12 @@
       button.setAttribute("aria-pressed", String(active));
       button.classList.toggle("is-active", active);
     });
+    byId("voucherPreview").hidden = true;
     setStatus("", false);
+    if (quick && byId("quickText").value.trim()) {
+      renderVoucher(parseQuickText(byId("quickText").value));
+      setStatus("Prévia atualizada automaticamente.", false);
+    }
   }
 
   let clientIndex = 0;
@@ -321,6 +326,16 @@
     byId("voucherForm").addEventListener("submit", (event) => event.preventDefault());
     byId("generatePDF").addEventListener("click", downloadVoucher);
     byId("generateQuickVoucher").addEventListener("click", downloadVoucher);
+    byId("quickText").addEventListener("input", () => {
+      const data = parseQuickText(byId("quickText").value);
+      if (!hasContent(data)) {
+        byId("voucherPreview").hidden = true;
+        setStatus("", false);
+        return;
+      }
+      renderVoucher(data);
+      setStatus("Prévia atualizada automaticamente. Clique em Gerar voucher PNG para baixar.", false);
+    });
     byId("previewQuickVoucher").addEventListener("click", () => {
       if (prepareVoucher()) byId("voucherPreview").scrollIntoView({ behavior: "smooth", block: "start" });
     });
