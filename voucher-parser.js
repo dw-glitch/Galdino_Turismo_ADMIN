@@ -60,7 +60,7 @@
     }
 
     function addClient(name, id) {
-      const client = { nome: clean(name), cpf: clean(id) };
+      const client = { nome: clean(name).replace(/[.,;]+$/, ""), cpf: clean(id) };
       if (!client.nome && !client.cpf) return;
       const duplicate = result.clients.find(c => client.nome && normalize(c.nome) === normalize(client.nome));
       if (duplicate) {
@@ -237,7 +237,7 @@
       if (section === "clients" && /^[\p{L}][\p{L}\s.'-]{2,100}$/u.test(line) && !/hotel|voo|transfer|pagamento|saida|chegada/i.test(line)) {
         addClient(line, ""); return true;
       }
-      m = /\b(?:reserva (?:em nome de|para)|passageiro|cliente|hospede)\s+([\p{Lu}][\p{L}.'-]+(?:\s+[\p{Lu}][\p{L}.'-]+){1,4})(?=[,.]|$)/u.exec(line);
+      m = /\b(?:reserva (?:em nome de|para)|passageiro|cliente|hospede)\s+([\p{Lu}][\p{L}.'-]+(?:\s+[\p{Lu}][\p{L}.'-]+){1,4})(?=[,.]|$)/iu.exec(line);
       if (m) {
         addClient(m[1], "");
         // Se a mesma frase informar o hotel, o trecho seguinte será avaliado separadamente.
