@@ -211,3 +211,24 @@ test("mantém nascimento idade e trajeto também no modelo manual", () => {
   assert.ok(appCode.includes('["idade", "Idade (anos)", "number"]'));
   assert.ok(appCode.includes('["Nome Completo", "CPF ou RG", "Nascimento", "Idade"]'));
 });
+
+
+test("CPF sem rótulo não é confundido com numeração de lista", () => {
+  const data = parseQuickText("JOANA DE ALMEIDA\n123.456.789-00\nNascimento: 07/02/1986");
+  assert.equal(data.clients[0].cpf, "123.456.789-00");
+  assert.equal(data.clients[0].dataNascimento, "07/02/1986");
+  assert.equal(data.unrecognized.length, 0);
+});
+
+test("clientes numerados continuam reconhecidos", () => {
+  const data = parseQuickText("1) ANA MARIA SOUZA\nCPF 123.456.789-00\n2) PEDRO COSTA\nCPF 234.567.890-11");
+  assert.equal(data.clients.length, 2);
+  assert.equal(data.clients[1].nome, "PEDRO COSTA");
+});
+
+test("nome em maiúsculas e data inline são associados mesmo sem CPF", () => {
+  const data = parseQuickText("LARA MARTINS ALMEIDA 27/03/2013 – 13 anos");
+  assert.equal(data.clients[0].nome, "LARA MARTINS ALMEIDA");
+  assert.equal(data.clients[0].dataNascimento, "27/03/2013");
+  assert.equal(data.clients[0].idade, "13");
+});
