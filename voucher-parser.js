@@ -370,8 +370,9 @@
         }
         const cpfLine = /^(?:CPF|CPF\s*\/\s*RG)\s*[:=\-]?\s*(\d{3}[.\s]?\d{3}[.\s]?\d{3}[-.\s]?\d{2}|\d{11})\b/i.exec(line);
         const rgLine = /^RG\s*[:=\-]?\s*([\d.\-]{4,20})/i.exec(line);
-        if (cpfLine || rgLine) {
-          const match = cpfLine || rgLine;
+        const bareCpf = collectingClient ? /^(\d{3}\.\d{3}\.\d{3}-\d{2}|\d{11})\b/.exec(line) : null;
+        if (cpfLine || rgLine || bareCpf) {
+          const match = cpfLine || rgLine || bareCpf;
           addId(match[1].trim());
           const afterId = line.slice(match[0].length).trim();
           if (afterId && DATE.test(afterId)) setBirthDate(afterId);
@@ -389,7 +390,7 @@
         }
 
         if (collectingClient && lastClient && DATE.test(line) &&
-            /^(?:data\s+(?:de\s+)?nascimento\s*[:=]?\s*)?\d{1,2}[\/.-]\d{1,2}[\/.-]\d{4}(?:\s*[-–—,]\s*\d{1,3}\s*anos?)?\s*$/i.test(line)) {
+            /^(?:(?:data\s+(?:de\s+)?nascimento|nascimento|nasc\.?|dn)\s*[:=\-]?\s*)?\d{1,2}[\/.-]\d{1,2}[\/.-]\d{4}(?:\s*[-–—,]\s*\d{1,3}\s*anos?)?\s*$/i.test(line)) {
           if (setBirthDate(line)) continue;
         }
 
@@ -397,8 +398,9 @@
         const looksLikeName = /^[\p{Lu}][\p{L}'’-]+(?:\s+(?:[\p{Lu}][\p{L}'’-]+|de|da|do|dos|das)){1,9}$/u.test(nameCandidate);
         const reserved = /\b(?:hotel|pousada|resort|motorista|condutor|origem|destino|saida|chegada|voo|transfer|trajeto|passageiro|passageiros|hospedagem|informacoes|informacao|pagamento|observacoes|cpf|data|telefone|contato|aeroporto|porto\s+de\s+galinhas)\b/i.test(normalize(nameCandidate));
         const next = lines.slice(i + 1).map(x => x.trim()).find(Boolean) || "";
-        const followedByCpf = /^CPF\s*[:=\-]?\s*\d/i.test(next);
-        if (looksLikeName && !reserved && (nameCandidate === nameCandidate.toLocaleUpperCase("pt-BR") || section === "clients" || followedByCpf)) {
+        const followedByCpf = /^(?:CPF\s*[:=\-]?\s*)?\d{3}[.\s]?\d{3}[.\s]?\d{3}[-.\s]?\d{2}\b/i.test(next);
+        const followedByBirth = /^(?:nascimento\s*[:=]\s*)?\d{1,2}[\/.-]\d{1,2}[\/.-]\d{4}\b/i.test(next);
+        if (looksLikeName && !reserved && (nameCandidate === nameCandidate.toLocaleUpperCase("pt-BR") || section === "clients" || followedByCpf || followedByBirth)) {
           addClient(nameCandidate, "");
           if (DATE.test(line)) setBirthDate(line);
           section = "clients";
